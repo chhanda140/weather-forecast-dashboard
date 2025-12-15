@@ -1,4 +1,5 @@
 import { fetchWeatherByCity, fetchForecastByCity } from "./api.js";
+import { renderCurrentWeather } from "./ui.js";
 
 const searchBtn = document.getElementById("searchBtn");
 const cityInput = document.getElementById("cityInput");
@@ -16,10 +17,7 @@ searchBtn.addEventListener("click", async () => {
     errorMessage.classList.add("hidden");
 
     const currentWeather = await fetchWeatherByCity(city);
-    const forecast = await fetchForecastByCity(city);
-
-    console.log(currentWeather);
-    console.log(forecast);
+    renderCurrentWeather(currentWeather);
 
   } catch (error) {
     showError(error.message);
