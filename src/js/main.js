@@ -1,8 +1,13 @@
-import { fetchWeatherByCity } from "./api.js";
+import {
+  fetchWeatherByCity,
+  fetchWeatherByCoords
+} from "./api.js";
+
 import {
   renderCurrentWeather,
   updateTemperature
 } from "./ui.js";
+
 
 const searchBtn = document.getElementById("searchBtn");
 const cityInput = document.getElementById("cityInput");
@@ -27,6 +32,34 @@ searchBtn.addEventListener("click", async () => {
     showError(error.message);
   }
 });
+
+
+const locationBtn = document.getElementById("locationBtn");
+
+locationBtn.addEventListener("click", () => {
+  if (!navigator.geolocation) {
+    showError("Geolocation is not supported by your browser");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      try {
+        errorMessage.classList.add("hidden");
+
+        const { latitude, longitude } = position.coords;
+        const weather = await fetchWeatherByCoords(latitude, longitude);
+        renderCurrentWeather(weather);
+      } catch (error) {
+        showError(error.message);
+      }
+    },
+    () => {
+      showError("Location permission denied");
+    }
+  );
+});
+
 
 celsiusBtn.addEventListener("click", () => {
   updateTemperature("C");
