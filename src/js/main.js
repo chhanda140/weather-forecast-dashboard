@@ -1,3 +1,5 @@
+let selectedCityFromDropdown = "";
+
 import {
   fetchWeatherByCity,
   fetchWeatherByCoords
@@ -8,20 +10,29 @@ import {
   updateTemperature
 } from "./ui.js";
 
-import { saveCity, getRecentCities } from "./storage.js";
+import {
+  saveCity,
+  getRecentCities
+} from "./storage.js";
 
-
+/* =======================
+   DOM ELEMENTS
+======================= */
 const searchBtn = document.getElementById("searchBtn");
+const locationBtn = document.getElementById("locationBtn");
 const cityInput = document.getElementById("cityInput");
 const errorMessage = document.getElementById("errorMessage");
-const recentCitiesDropdown = document.getElementById("recentCities");
-
 
 const celsiusBtn = document.getElementById("celsiusBtn");
 const fahrenheitBtn = document.getElementById("fahrenheitBtn");
 
+const recentCitiesDropdown = document.getElementById("recentCities");
+
+/* =======================
+   SEARCH BY CITY
+======================= */
 searchBtn.addEventListener("click", async () => {
-  const city = cityInput.value.trim();
+  const city = cityInput.value.trim() || selectedCityFromDropdown;
 
   if (!city) {
     showError("Please enter a city name");
@@ -30,18 +41,22 @@ searchBtn.addEventListener("click", async () => {
 
   try {
     errorMessage.classList.add("hidden");
+
     const currentWeather = await fetchWeatherByCity(city);
     renderCurrentWeather(currentWeather);
+
+    // ✅ Save CLEAN city name from API
+    saveCity(currentWeather.name);
+    updateRecentCities();
+
   } catch (error) {
     showError(error.message);
   }
-    saveCity(city);
-    updateRecentCities();
 });
 
-
-const locationBtn = document.getElementById("locationBtn");
-
+/* =======================
+   CURRENT LOCATION
+======================= */
 locationBtn.addEventListener("click", () => {
   if (!navigator.geolocation) {
     showError("Geolocation is not supported by your browser");
@@ -56,6 +71,7 @@ locationBtn.addEventListener("click", () => {
         const { latitude, longitude } = position.coords;
         const weather = await fetchWeatherByCoords(latitude, longitude);
         renderCurrentWeather(weather);
+
       } catch (error) {
         showError(error.message);
       }
@@ -66,7 +82,9 @@ locationBtn.addEventListener("click", () => {
   );
 });
 
-
+/* =======================
+   TEMPERATURE TOGGLE
+======================= */
 celsiusBtn.addEventListener("click", () => {
   updateTemperature("C");
   celsiusBtn.classList.add("bg-blue-600", "text-white");
@@ -79,13 +97,15 @@ fahrenheitBtn.addEventListener("click", () => {
   celsiusBtn.classList.remove("bg-blue-600", "text-white");
 });
 
-function showError(message) {
-  errorMessage.textContent = message;
-  errorMessage.classList.remove("hidden");
-}
-
+/* =======================
+   RECENT CITIES DROPDOWN
+======================= */
 function updateRecentCities() {
   const cities = getRecentCities();
+
+  // 🔍 DEBUG LINE (TEMPORARY)
+  console.log("Recent cities:", cities);
+
   recentCitiesDropdown.innerHTML =
     `<option value="">Recently searched cities</option>`;
 
@@ -104,14 +124,28 @@ function updateRecentCities() {
   recentCitiesDropdown.classList.remove("hidden");
 }
 
-recentCitiesDropdown.addEventListener("change", async () => {
-  const city = recentCitiesDropdown.value;
+
+recentCitiesDropdown.addEventListener("change", (e) => {
+  const city = e.target.value;
   if (!city) return;
 
-  try {
-    const weather = await fetchWeatherByCity(city);
-    renderCurrentWeather(weather);
-  } catch (error) {
-    showError(error.message);
-  }
+  selectedCityFromDropdown = city;
+  cityInput.value = city; // show it in input for clarity
+});
+
+
+
+/* =======================
+   ERROR HANDLER
+======================= */
+function showError(message) {
+  errorMessage.textContent = message;
+  errorMessage.classList.remove("hidden");
+}
+
+/* =======================
+   INIT ON PAGE LOAD
+======================= */
+document.addEventListener("DOMContentLoaded", () => {
+  updateRecentCities();
 });
