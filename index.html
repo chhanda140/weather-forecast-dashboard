@@ -35,6 +35,14 @@
           Search
         </button>
 
+        <select
+          id="recentCities"
+          class="w-full p-2 border rounded mb-4 hidden"
+        >
+          <option value="">Recently searched cities</option>
+        </select>
+
+
         <button
           id="locationBtn"
           class="flex-1 bg-gray-700 text-white p-2 rounded"
@@ -67,6 +75,20 @@
   <div id="weatherContent"></div>
 </section>
 
+
+<!-- 5-Day Forecast -->
+<section class="mt-6">
+  <h2 class="text-xl font-semibold mb-4">5-Day Forecast</h2>
+
+  <div
+    id="forecastContainer"
+    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4"
+  >
+    <!-- Forecast cards will be injected here -->
+  </div>
+</section>
+
+
       <!-- Filled dynamically -->
     </section>
 
@@ -84,6 +106,6 @@
   </main>
 
   <!-- JavaScript -->
-  <script src="src/js/main.js"></script>
+  <script type="module" src="./src/js/main.js"></script>
 </body>
 </html>

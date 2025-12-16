@@ -80,3 +80,44 @@ function updateBackground(condition) {
     body.classList.add("bg-gray-100");
   }
 }
+
+/* =======================
+   5-DAY FORECAST UI
+======================= */
+export function renderFiveDayForecast(data) {
+  const container = document.getElementById("forecastContainer");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  // OpenWeatherMap gives data every 3 hours
+  // Take one forecast per day (around noon)
+  const dailyForecast = data.list.filter(item =>
+    item.dt_txt.includes("12:00:00")
+  );
+
+  dailyForecast.forEach(day => {
+    const date = new Date(day.dt_txt).toDateString();
+    const temp = Math.round(day.main.temp);
+    const wind = day.wind.speed;
+    const humidity = day.main.humidity;
+    const icon = day.weather[0].icon;
+
+    const card = document.createElement("div");
+    card.className = "bg-white p-4 rounded shadow text-center";
+
+    card.innerHTML = `
+      <h3 class="font-semibold mb-2">${date}</h3>
+      <img
+        src="https://openweathermap.org/img/wn/${icon}@2x.png"
+        alt="weather icon"
+        class="mx-auto"
+      />
+      <p class="font-bold">${temp}°C</p>
+      <p class="text-sm">Wind: ${wind} m/s</p>
+      <p class="text-sm">Humidity: ${humidity}%</p>
+    `;
+
+    container.appendChild(card);
+  });
+}

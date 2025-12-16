@@ -1,19 +1,9 @@
-let selectedCityFromDropdown = "";
+import { fetchWeatherByCity, fetchWeatherByCoords } from "./api.js";
+import { renderCurrentWeather, updateTemperature } from "./ui.js";
+import { saveCity, getRecentCities } from "./storage.js";
+import { fetchFiveDayForecast } from "./api.js";
+import { renderFiveDayForecast } from "./ui.js";
 
-import {
-  fetchWeatherByCity,
-  fetchWeatherByCoords
-} from "./api.js";
-
-import {
-  renderCurrentWeather,
-  updateTemperature
-} from "./ui.js";
-
-import {
-  saveCity,
-  getRecentCities
-} from "./storage.js";
 
 /* =======================
    DOM ELEMENTS
@@ -29,10 +19,10 @@ const fahrenheitBtn = document.getElementById("fahrenheitBtn");
 const recentCitiesDropdown = document.getElementById("recentCities");
 
 /* =======================
-   SEARCH BY CITY
+   SEARCH BY CITY (INPUT)
 ======================= */
 searchBtn.addEventListener("click", async () => {
-  const city = cityInput.value.trim() || selectedCityFromDropdown;
+  const city = cityInput.value.trim();
 
   if (!city) {
     showError("Please enter a city name");
@@ -42,13 +32,32 @@ searchBtn.addEventListener("click", async () => {
   try {
     errorMessage.classList.add("hidden");
 
-    const currentWeather = await fetchWeatherByCity(city);
-    renderCurrentWeather(currentWeather);
+    const weather = await fetchWeatherByCity(city);
+    renderCurrentWeather(weather);
 
-    // ✅ Save CLEAN city name from API
-    saveCity(currentWeather.name);
+    const forecastData = await fetchFiveDayForecast(city);
+    renderFiveDayForecast(forecastData);
+
+
+    saveCity(weather.name);
     updateRecentCities();
+  } catch (error) {
+    showError(error.message);
+  }
+});
 
+/* =======================
+   DROPDOWN SELECTION
+======================= */
+recentCitiesDropdown.addEventListener("change", async (e) => {
+  const city = e.target.value;
+  if (!city) return;
+
+  try {
+    errorMessage.classList.add("hidden");
+
+    const weather = await fetchWeatherByCity(city);
+    renderCurrentWeather(weather);
   } catch (error) {
     showError(error.message);
   }
@@ -59,52 +68,36 @@ searchBtn.addEventListener("click", async () => {
 ======================= */
 locationBtn.addEventListener("click", () => {
   if (!navigator.geolocation) {
-    showError("Geolocation is not supported by your browser");
+    showError("Geolocation not supported");
     return;
   }
 
   navigator.geolocation.getCurrentPosition(
-    async (position) => {
+    async (pos) => {
       try {
         errorMessage.classList.add("hidden");
-
-        const { latitude, longitude } = position.coords;
+        const { latitude, longitude } = pos.coords;
         const weather = await fetchWeatherByCoords(latitude, longitude);
         renderCurrentWeather(weather);
-
       } catch (error) {
         showError(error.message);
       }
     },
-    () => {
-      showError("Location permission denied");
-    }
+    () => showError("Location permission denied")
   );
 });
 
 /* =======================
-   TEMPERATURE TOGGLE
+   TEMP TOGGLE
 ======================= */
-celsiusBtn.addEventListener("click", () => {
-  updateTemperature("C");
-  celsiusBtn.classList.add("bg-blue-600", "text-white");
-  fahrenheitBtn.classList.remove("bg-blue-600", "text-white");
-});
-
-fahrenheitBtn.addEventListener("click", () => {
-  updateTemperature("F");
-  fahrenheitBtn.classList.add("bg-blue-600", "text-white");
-  celsiusBtn.classList.remove("bg-blue-600", "text-white");
-});
+celsiusBtn.addEventListener("click", () => updateTemperature("C"));
+fahrenheitBtn.addEventListener("click", () => updateTemperature("F"));
 
 /* =======================
-   RECENT CITIES DROPDOWN
+   RECENT CITIES
 ======================= */
 function updateRecentCities() {
   const cities = getRecentCities();
-
-  // 🔍 DEBUG LINE (TEMPORARY)
-  console.log("Recent cities:", cities);
 
   recentCitiesDropdown.innerHTML =
     `<option value="">Recently searched cities</option>`;
@@ -124,19 +117,8 @@ function updateRecentCities() {
   recentCitiesDropdown.classList.remove("hidden");
 }
 
-
-recentCitiesDropdown.addEventListener("change", (e) => {
-  const city = e.target.value;
-  if (!city) return;
-
-  selectedCityFromDropdown = city;
-  cityInput.value = city; // show it in input for clarity
-});
-
-
-
 /* =======================
-   ERROR HANDLER
+   ERROR
 ======================= */
 function showError(message) {
   errorMessage.textContent = message;
@@ -144,8 +126,6 @@ function showError(message) {
 }
 
 /* =======================
-   INIT ON PAGE LOAD
+   INIT
 ======================= */
-document.addEventListener("DOMContentLoaded", () => {
-  updateRecentCities();
-});
+document.addEventListener("DOMContentLoaded", updateRecentCities);
