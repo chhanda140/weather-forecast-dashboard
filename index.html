@@ -5,21 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Weather Forecast Dashboard</title>
 
-  <!-- Tailwind CDN (acceptable for this project) -->
-  <script type="module" src="src/js/main.js"></script>
+  <!-- Tailwind CDN (acceptable for assignments) -->
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="min-h-screen bg-gray-100">
 
-  <!-- Header -->
+<body class="min-h-screen bg-gray-100">
   <header class="bg-blue-600 text-white p-4 text-center">
     <h1 class="text-2xl font-semibold">Weather Forecast Dashboard</h1>
   </header>
 
-  <!-- Main Container -->
   <main class="p-4 max-w-5xl mx-auto">
 
     <!-- Search Section -->
-    <section class="mb-4">
+    <section class="mb-6">
       <input
         id="cityInput"
         type="text"
@@ -27,85 +25,48 @@
         class="w-full p-2 border rounded mb-2"
       />
 
-      <div class="flex gap-2">
+      <div class="flex gap-2 mb-2">
         <button
           id="searchBtn"
-          class="flex-1 bg-blue-600 text-white p-2 rounded"
+          class="bg-blue-600 text-white px-4 py-2 rounded"
         >
           Search
         </button>
 
-        <select
-          id="recentCities"
-          class="w-full p-2 border rounded mb-4 hidden"
-        >
-          <option value="">Recently searched cities</option>
-        </select>
-
-
         <button
           id="locationBtn"
-          class="flex-1 bg-gray-700 text-white p-2 rounded"
+          class="bg-gray-600 text-white px-4 py-2 rounded"
         >
           Use Current Location
         </button>
       </div>
 
-      <!-- Error Message -->
-      <p id="errorMessage" class="text-red-600 mt-2 hidden"></p>
+      <p id="errorMessage" class="text-red-600 hidden"></p>
     </section>
 
     <!-- Current Weather -->
     <section id="currentWeather" class="mb-6 hidden">
-  <div class="flex justify-end mb-2 gap-2">
-    <button
-      id="celsiusBtn"
-      class="px-3 py-1 bg-blue-600 text-white rounded text-sm"
-    >
-      °C
-    </button>
-    <button
-      id="fahrenheitBtn"
-      class="px-3 py-1 bg-gray-300 rounded text-sm"
-    >
-      °F
-    </button>
-  </div>
+      <div id="weatherContent"></div>
 
-  <div id="weatherContent"></div>
-</section>
-
-
-<!-- 5-Day Forecast -->
-<section class="mt-6">
-  <h2 class="text-xl font-semibold mb-4">5-Day Forecast</h2>
-
-  <div
-    id="forecastContainer"
-    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4"
-  >
-    <!-- Forecast cards will be injected here -->
-  </div>
-</section>
-
-
-      <!-- Filled dynamically -->
+      <div class="mt-3 flex gap-2">
+        <button id="celsiusBtn" class="border px-3 py-1 rounded">°C</button>
+        <button id="fahrenheitBtn" class="border px-3 py-1 rounded">°F</button>
+      </div>
     </section>
 
     <!-- 5-Day Forecast -->
-    <section>
-      <h2 class="text-xl font-semibold mb-2">5-Day Forecast</h2>
+    <section class="mt-6">
+      <h2 class="text-xl font-semibold mb-4">5-Day Forecast</h2>
+
       <div
         id="forecastContainer"
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4"
-      >
-        <!-- Forecast cards go here -->
-      </div>
+      ></div>
     </section>
 
   </main>
 
-  <!-- JavaScript -->
+  <!-- MAIN JS (MODULE) -->
   <script type="module" src="./src/js/main.js"></script>
 </body>
 </html>

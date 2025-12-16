@@ -1,11 +1,14 @@
 const STORAGE_KEY = "recentCities";
 
 export function getRecentCities() {
-  return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  const data = localStorage.getItem(STORAGE_KEY);
+  return data ? JSON.parse(data) : [];
 }
 
 export function saveCity(city) {
   let cities = getRecentCities();
+
+  city = city.trim();
 
   if (!cities.includes(city)) {
     cities.unshift(city);
